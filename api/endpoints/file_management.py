@@ -8,27 +8,7 @@ router = APIRouter(
     tags=["File/Folder Management"] # Group these endpoints under a new tag
 )
 
-@router.get("/file_manager/list_contents", response_model=Dict[str, Any])
-async def list_folder_contents_endpoint(
-    folder_id: Optional[str] = Query(None, description="Optional Folder-ID to list contents from. If not provided, lists root.")
-):
-    """
-    Shows the content (folders and files) of a given Streamtape folder.
-    If no folder_id is provided, it lists the contents of the root folder.
-
-    Args:
-        folder_id (str, optional): The ID of the folder whose contents you want to list.
-
-    Returns:
-        dict: A dictionary containing lists of folders and files.
-    """
-    try:
-        contents = await streamtape_service.list_folder_contents(folder_id=folder_id)
-        return contents
-    except HTTPException as e:
-        raise e
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"An unexpected error occurred: {e}")
+# --- Reordered and Modified Endpoints ---
 
 @router.post("/file_manager/create_folder", response_model=Dict[str, str])
 async def create_folder_endpoint(
@@ -48,6 +28,29 @@ async def create_folder_endpoint(
     try:
         new_folder_info = await streamtape_service.create_folder(name=name, parent_folder_id=parent_folder_id)
         return new_folder_info
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"An unexpected error occurred: {e}")
+
+@router.get("/file_manager/list_contents", response_model=Dict[str, Any])
+async def list_folder_contents_endpoint(
+    # CHANGE: Make folder_id mandatory by removing Optional and setting no default (or ...)
+    folder_id: str = Query(..., description="**Mandatory** Folder-ID to list contents from.")
+):
+    """
+    Shows the content (folders and files) of a given Streamtape folder.
+
+    Args:
+        folder_id (str): The ID of the folder whose contents you want to list. This parameter is now mandatory.
+
+    Returns:
+        dict: A dictionary containing lists of folders and files.
+    """
+    try:
+        # Pass the mandatory folder_id to the service method
+        contents = await streamtape_service.list_folder_contents(folder_id=folder_id)
+        return contents
     except HTTPException as e:
         raise e
     except Exception as e:
