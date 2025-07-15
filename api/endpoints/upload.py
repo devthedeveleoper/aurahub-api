@@ -1,5 +1,5 @@
-from fastapi import APIRouter, HTTPException, Query
-from typing import Optional, Dict, Any
+from fastapi import APIRouter, HTTPException, Query, Body
+from typing import Optional, Dict, Any, Union
 from api.services.streamtape_service import streamtape_service
 
 # Create an APIRouter instance
@@ -40,5 +40,78 @@ async def get_upload_url_endpoint(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"An unexpected error occurred: {e}")
 
-# You can add more upload-related endpoints here, e.g., for direct file upload via your API.
-# We'll cover that in a later step!
+# --- New Remote Upload Endpoints ---
+
+@router.post("/remote_upload/add", response_model=Dict[str, str])
+async def add_remote_upload_endpoint(
+    url: str = Body(..., description="The remote URL of the file to upload"),
+    folder: Optional[str] = Body(None, description="Optional Folder-ID to upload to"),
+    headers: Optional[str] = Body(None, description="Additional HTTP headers (e.g. 'Cookie: key=value'), separated by newlines"),
+    name: Optional[str] = Body(None, description="Custom name for the new file (optional)")
+):
+    """
+    Adds a remote upload task to Streamtape.
+
+    Args:
+        url (str): The direct URL of the remote file to be uploaded.
+        folder (str, optional): The ID of the folder to upload the file to.
+        headers (str, optional): Additional HTTP headers for the remote server (e.g., for authentication).
+        name (str, optional): A custom name for the uploaded file.
+
+    Returns:
+        dict: A dictionary containing the ID of the remote upload task and the folder ID.
+    """
+    try:
+        remote_upload_info = await streamtape_service.add_remote_upload(
+            url=url,
+            folder=folder,
+            headers=headers,
+            name=name
+        )
+        return remote_upload_info
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"An unexpected error occurred: {e}")
+
+@router.delete("/remote_upload/remove/{remote_upload_id}", response_model=Dict[str, bool])
+async def remove_remote_upload_endpoint(
+    remote_upload_id: str = Query(..., description="The ID of the remote upload to remove, or 'all' to remove all.")
+):
+    """
+    Removes or cancels a remote upload task on Streamtape.
+
+    Args:
+        remote_upload_id (str): The ID of the remote upload to remove, or "all" to remove all remote uploads.
+
+    Returns:
+        dict: A dictionary indicating success ({"result": true}).
+    """
+    try:
+        success = await streamtape_service.remove_remote_upload(remote_upload_id=remote_upload_id)
+        return {"result": success}
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"An unexpected error occurred: {e}")
+
+@router.get("/remote_upload/status/{remote_upload_id}", response_model=Dict[str, Any])
+async def check_remote_upload_status_endpoint(
+    remote_upload_id: str = Query(..., description="The ID of the remote upload to check.")
+):
+    """
+    Checks the status of a specific remote upload task on Streamtape.
+
+    Args:
+        remote_upload_id (str): The ID of the remote upload to check.
+
+    Returns:
+        dict: A dictionary containing the status details of the remote upload.
+    """
+    try:
+        status_info = await streamtape_service.check_remote_upload_status(remote_upload_id=remote_upload_id)
+        return status_info
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"An unexpected error occurred: {e}")

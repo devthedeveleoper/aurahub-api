@@ -1,7 +1,7 @@
 import httpx
 from fastapi import HTTPException
 from config import settings
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, Union
 
 class StreamtapeService:
     """
@@ -33,9 +33,13 @@ class StreamtapeService:
                 if data.get("status") == 200:
                     return data["result"]
                 else:
+                    error_msg = data.get("msg", "An error occurred with the Streamtape API.")
+                    # Streamtape sometimes returns specific error messages that are useful
+                    if "result" in data and isinstance(data["result"], str):
+                        error_msg = f"{error_msg}: {data['result']}"
                     raise HTTPException(
                         status_code=data.get("status", 500),
-                        detail=data.get("msg", "An error occurred with the Streamtape API.")
+                        detail=error_msg
                     )
             except httpx.RequestError as exc:
                 raise HTTPException(
@@ -66,6 +70,49 @@ class StreamtapeService:
             params["sha256"] = sha256
         if httponly is not None:
             params["httponly"] = str(httponly).lower()
+
+        return await self._make_request(endpoint, params)
+
+    async def add_remote_upload(
+        self,
+        url: str,
+        folder: Optional[str] = None,
+        headers: Optional[str] = None,
+        name: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """
+        Adds a remote upload task to Streamtape.
+        """
+        endpoint = "/remotedl/add"
+        params: Dict[str, Any] = {"url": url}
+
+        if folder:
+            params["folder"] = folder
+        if headers:
+            params["headers"] = headers
+        if name:
+            params["name"] = name
+
+        return await self._make_request(endpoint, params)
+
+    async def remove_remote_upload(self, remote_upload_id: str) -> bool:
+        """
+        Removes/cancels a remote upload task on Streamtape.
+        Set remote_upload_id to "all" to remove all remote uploads.
+        """
+        endpoint = "/remotedl/remove"
+        params: Dict[str, Any] = {"id": remote_upload_id}
+
+        result = await self._make_request(endpoint, params)
+        # The API returns {"result": true} on success
+        return result is True
+
+    async def check_remote_upload_status(self, remote_upload_id: str) -> Dict[str, Any]:
+        """
+        Checks the status of a remote upload task on Streamtape.
+        """
+        endpoint = "/remotedl/status"
+        params: Dict[str, Any] = {"id": remote_upload_id}
 
         return await self._make_request(endpoint, params)
 
