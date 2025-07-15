@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Query, Body
+from fastapi import APIRouter, HTTPException, Query, Body # Keep Query and Body for other uses
 from typing import Optional, Dict, Any, Union
 from api.services.streamtape_service import streamtape_service
 
@@ -40,7 +40,7 @@ async def get_upload_url_endpoint(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"An unexpected error occurred: {e}")
 
-# --- New Remote Upload Endpoints ---
+# --- Remote Upload Endpoints ---
 
 @router.post("/remote_upload/add", response_model=Dict[str, str])
 async def add_remote_upload_endpoint(
@@ -76,7 +76,8 @@ async def add_remote_upload_endpoint(
 
 @router.delete("/remote_upload/remove/{remote_upload_id}", response_model=Dict[str, bool])
 async def remove_remote_upload_endpoint(
-    remote_upload_id: str = Query(..., description="The ID of the remote upload to remove, or 'all' to remove all.")
+    # CHANGE HERE: Removed Query(...) as it's a path parameter
+    remote_upload_id: str
 ):
     """
     Removes or cancels a remote upload task on Streamtape.
@@ -97,7 +98,8 @@ async def remove_remote_upload_endpoint(
 
 @router.get("/remote_upload/status/{remote_upload_id}", response_model=Dict[str, Any])
 async def check_remote_upload_status_endpoint(
-    remote_upload_id: str = Query(..., description="The ID of the remote upload to check.")
+    # CHANGE HERE: Removed Query(...) as it's a path parameter
+    remote_upload_id: str
 ):
     """
     Checks the status of a specific remote upload task on Streamtape.
