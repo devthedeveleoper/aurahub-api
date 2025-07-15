@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Query, Body # Keep Query and Body for other uses
+from fastapi import APIRouter, HTTPException, Query, Body # Keep Body for now, in case you need it elsewhere
 from typing import Optional, Dict, Any, Union
 from api.services.streamtape_service import streamtape_service
 
@@ -44,10 +44,11 @@ async def get_upload_url_endpoint(
 
 @router.post("/remote_upload/add", response_model=Dict[str, str])
 async def add_remote_upload_endpoint(
-    url: str = Body(..., description="The remote URL of the file to upload"),
-    folder: Optional[str] = Body(None, description="Optional Folder-ID to upload to"),
-    headers: Optional[str] = Body(None, description="Additional HTTP headers (e.g. 'Cookie: key=value'), separated by newlines"),
-    name: Optional[str] = Body(None, description="Custom name for the new file (optional)")
+    # CHANGED: Use Query(...) for parameters instead of Body(...)
+    url: str = Query(..., description="The remote URL of the file to upload"),
+    folder: Optional[str] = Query(None, description="Optional Folder-ID to upload to"),
+    headers: Optional[str] = Query(None, description="Additional HTTP headers (e.g. 'Cookie: key=value'), separated by newlines"),
+    name: Optional[str] = Query(None, description="Custom name for the new file (optional)")
 ):
     """
     Adds a remote upload task to Streamtape.
@@ -76,7 +77,6 @@ async def add_remote_upload_endpoint(
 
 @router.delete("/remote_upload/remove/{remote_upload_id}", response_model=Dict[str, bool])
 async def remove_remote_upload_endpoint(
-    # CHANGE HERE: Removed Query(...) as it's a path parameter
     remote_upload_id: str
 ):
     """
@@ -98,7 +98,6 @@ async def remove_remote_upload_endpoint(
 
 @router.get("/remote_upload/status/{remote_upload_id}", response_model=Dict[str, Any])
 async def check_remote_upload_status_endpoint(
-    # CHANGE HERE: Removed Query(...) as it's a path parameter
     remote_upload_id: str
 ):
     """
