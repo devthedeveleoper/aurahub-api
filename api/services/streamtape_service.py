@@ -57,6 +57,7 @@ class StreamtapeService:
                     detail=f"An unexpected error occurred: {exc}"
                 )
 
+    # --- Upload Related Methods (Existing) ---
     async def get_upload_url(self, folder: Optional[str] = None, sha256: Optional[str] = None, httponly: Optional[bool] = None) -> Dict[str, Any]:
         """
         Retrieves a unique upload URL from Streamtape.
@@ -104,8 +105,7 @@ class StreamtapeService:
         params: Dict[str, Any] = {"id": remote_upload_id}
 
         result = await self._make_request(endpoint, params)
-        # The API returns {"result": true} on success
-        return result is True
+        return result is True # API returns {"result": true} on success
 
     async def check_remote_upload_status(self, remote_upload_id: str) -> Dict[str, Any]:
         """
@@ -115,6 +115,75 @@ class StreamtapeService:
         params: Dict[str, Any] = {"id": remote_upload_id}
 
         return await self._make_request(endpoint, params)
+
+    # --- File/Folder Management Methods (New) ---
+
+    async def list_folder_contents(self, folder_id: Optional[str] = None) -> Dict[str, Any]:
+        """
+        Shows the content (folders and files) of a given Streamtape folder.
+        If folder_id is not provided, lists root folder contents.
+        """
+        endpoint = "/file/listfolder"
+        params: Dict[str, Any] = {}
+        if folder_id:
+            params["folder"] = folder_id
+        return await self._make_request(endpoint, params)
+
+    async def create_folder(self, name: str, parent_folder_id: Optional[str] = None) -> Dict[str, str]:
+        """
+        Creates a new folder on Streamtape.
+        """
+        endpoint = "/file/createfolder"
+        params: Dict[str, Any] = {"name": name}
+        if parent_folder_id:
+            params["pid"] = parent_folder_id
+        return await self._make_request(endpoint, params)
+
+    async def rename_folder(self, folder_id: str, new_name: str) -> bool:
+        """
+        Renames a folder on Streamtape.
+        """
+        endpoint = "/file/renamefolder"
+        params: Dict[str, Any] = {"folder": folder_id, "name": new_name}
+        result = await self._make_request(endpoint, params)
+        return result is True
+
+    async def delete_folder(self, folder_id: str) -> bool:
+        """
+        Deletes a folder and all its contents (subfolders and files) on Streamtape.
+        """
+        endpoint = "/file/deletefolder"
+        params: Dict[str, Any] = {"folder": folder_id}
+        result = await self._make_request(endpoint, params)
+        return result is True
+
+    async def rename_file(self, file_id: str, new_name: str) -> bool:
+        """
+        Renames a file on Streamtape.
+        """
+        endpoint = "/file/rename"
+        params: Dict[str, Any] = {"file": file_id, "name": new_name}
+        result = await self._make_request(endpoint, params)
+        return result is True
+
+    async def move_file(self, file_id: str, destination_folder_id: str) -> bool:
+        """
+        Moves a file into a different folder on Streamtape.
+        """
+        endpoint = "/file/move"
+        params: Dict[str, Any] = {"file": file_id, "folder": destination_folder_id}
+        result = await self._make_request(endpoint, params)
+        return result is True
+
+    async def delete_file(self, file_id: str) -> bool:
+        """
+        Deletes a file from Streamtape.
+        """
+        endpoint = "/file/delete"
+        params: Dict[str, Any] = {"file": file_id}
+        result = await self._make_request(endpoint, params)
+        return result is True
+
 
 # Initialize the service to be used across endpoints
 streamtape_service = StreamtapeService()
