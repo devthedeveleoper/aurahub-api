@@ -4,14 +4,14 @@ from api.services.streamtape_service import streamtape_service
 
 # Create an APIRouter instance for converts and thumbnail management
 router = APIRouter(
-    prefix="/streamtape", # All endpoints in this router will start with /streamtape
+    prefix="/v1", # All endpoints in this router will start with /v1
     tags=["Converts & Thumbnails"] # Group these endpoints under a new tag
 )
 
 @router.get("/converts/running", response_model=List[Dict[str, Any]])
 async def list_running_converts_endpoint():
     """
-    Lists all video conversion tasks that are currently running on Streamtape, including their progress.
+    Lists all video conversion tasks that are currently running on AuraHub, including their progress.
 
     Returns:
         list: A list of dictionaries, each representing a running conversion.
@@ -27,7 +27,7 @@ async def list_running_converts_endpoint():
 @router.get("/converts/failed", response_model=List[Dict[str, Any]])
 async def list_failed_converts_endpoint():
     """
-    Lists all video conversion tasks that have failed on Streamtape.
+    Lists all video conversion tasks that have failed on AuraHub.
 
     Returns:
         list: A list of dictionaries, each representing a failed conversion.

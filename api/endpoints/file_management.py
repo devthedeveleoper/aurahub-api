@@ -4,7 +4,7 @@ from api.services.streamtape_service import streamtape_service
 
 # Create an APIRouter instance for file/folder management
 router = APIRouter(
-    prefix="/streamtape", # All endpoints in this router will start with /streamtape
+    prefix="/v1", # All endpoints in this router will start with /v1
     tags=["File/Folder Management"] # Group these endpoints under a new tag
 )
 
@@ -16,7 +16,7 @@ async def create_folder_endpoint(
     parent_folder_id: Optional[str] = Query(None, description="Optional Parent Folder ID. If not set, folder will be created in the root.")
 ):
     """
-    Creates a new folder on Streamtape.
+    Creates a new folder on AuraHub.
 
     Args:
         name (str): The name of the new folder.
@@ -39,7 +39,7 @@ async def list_folder_contents_endpoint(
     folder_id: str = Query(..., description="**Mandatory** Folder-ID to list contents from.")
 ):
     """
-    Shows the content (folders and files) of a given Streamtape folder.
+    Shows the content (folders and files) of a given AuraHub folder.
 
     Args:
         folder_id (str): The ID of the folder whose contents you want to list. This parameter is now mandatory.
@@ -62,7 +62,7 @@ async def rename_folder_endpoint(
     new_name: str = Query(..., description="The new name for the folder.")
 ):
     """
-    Renames an existing folder on Streamtape.
+    Renames an existing folder on AuraHub.
 
     Args:
         folder_id (str): The ID of the folder to rename.
@@ -84,7 +84,7 @@ async def delete_folder_endpoint(
     folder_id: str = Path(..., description="The ID of the folder to delete (all contents will be lost!).")
 ):
     """
-    Deletes a folder and all its contents (subfolders and files) on Streamtape. Be careful!
+    Deletes a folder and all its contents (subfolders and files) on AuraHub. Be careful!
 
     Args:
         folder_id (str): The ID of the folder to delete.
@@ -106,7 +106,7 @@ async def rename_file_endpoint(
     new_name: str = Query(..., description="The new name for the file (including extension, e.g., 'video.mp4').")
 ):
     """
-    Renames a file on Streamtape.
+    Renames a file on AuraHub.
 
     Args:
         file_id (str): The ID of the file to rename.
@@ -129,7 +129,7 @@ async def move_file_endpoint(
     destination_folder_id: str = Query(..., description="The ID of the destination folder.")
 ):
     """
-    Moves a file into a different folder on Streamtape.
+    Moves a file into a different folder on AuraHub.
 
     Args:
         file_id (str): The ID of the file to move.
@@ -151,7 +151,7 @@ async def delete_file_endpoint(
     file_id: str = Path(..., description="The ID of the file to delete.")
 ):
     """
-    Deletes a file from Streamtape.
+    Deletes a file from AuraHub.
 
     Args:
         file_id (str): The ID of the file to delete.

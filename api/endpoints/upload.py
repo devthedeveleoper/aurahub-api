@@ -4,7 +4,7 @@ from api.services.streamtape_service import streamtape_service
 
 # Create an APIRouter instance
 router = APIRouter(
-    prefix="/streamtape", # All endpoints in this router will start with /streamtape
+    prefix="/v1", # All endpoints in this router will start with /v1
     tags=["Upload"] # Group these endpoints under the "Upload" tag in Swagger UI
 )
 
@@ -15,13 +15,13 @@ async def get_upload_url_endpoint(
     httponly: Optional[bool] = Query(None, description="If true, use only HTTP upload links (not recommended for production)")
 ):
     """
-    Retrieves a unique upload URL from Streamtape. Files shall be POSTed to this URL.
+    Retrieves a unique upload URL from AuraHub. Files shall be POSTed to this URL.
 
     Args:
         folder (str, optional): The ID of the folder to upload the file to.
         sha256 (str, optional): The expected SHA256 hash of the file. If the uploaded file's hash
                                 doesn't match, the upload will fail.
-        httponly (bool, optional): If set to true, Streamtape will return HTTP upload links.
+        httponly (bool, optional): If set to true, AuraHub will return HTTP upload links.
                                    It's recommended to use HTTPS, so this should generally be False or None.
 
     Returns:
@@ -51,7 +51,7 @@ async def add_remote_upload_endpoint(
     name: Optional[str] = Query(None, description="Custom name for the new file (optional)")
 ):
     """
-    Adds a remote upload task to Streamtape.
+    Adds a remote upload task to AuraHub.
 
     Args:
         url (str): The direct URL of the remote file to be uploaded.
@@ -80,7 +80,7 @@ async def remove_remote_upload_endpoint(
     remote_upload_id: str
 ):
     """
-    Removes or cancels a remote upload task on Streamtape.
+    Removes or cancels a remote upload task on AuraHub.
 
     Args:
         remote_upload_id (str): The ID of the remote upload to remove, or "all" to remove all remote uploads.
@@ -101,7 +101,7 @@ async def check_remote_upload_status_endpoint(
     remote_upload_id: str
 ):
     """
-    Checks the status of a specific remote upload task on Streamtape.
+    Checks the status of a specific remote upload task on AuraHub.
 
     Args:
         remote_upload_id (str): The ID of the remote upload to check.

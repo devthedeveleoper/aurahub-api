@@ -4,7 +4,7 @@ from api.services.streamtape_service import streamtape_service
 
 # Create an APIRouter instance for streaming functionalities
 router = APIRouter(
-    prefix="/streamtape", # All endpoints in this router will start with /streamtape
+    prefix="/v1", # All endpoints in this router will start with /v1
     tags=["Stream & Info"] # Group these endpoints under a new tag
 )
 
@@ -13,7 +13,7 @@ async def get_download_ticket_endpoint(
     file_id: str = Path(..., description="The ID of the file for which to get a download ticket.")
 ):
     """
-    Prepares a download ticket for a given Streamtape file. This ticket is required
+    Prepares a download ticket for a given AuraHub file. This ticket is required
     to obtain the final download link and ensures privacy by not exposing API credentials.
 
     Args:
@@ -34,16 +34,16 @@ async def get_download_ticket_endpoint(
 async def get_final_download_link_endpoint(
     file_id: str = Path(..., description="The ID of the file."),
     ticket: str = Query(..., description="The previously generated download ticket."),
-    captcha_response: Optional[str] = Query(None, description="Optional captcha response if required by Streamtape.")
+    captcha_response: Optional[str] = Query(None, description="Optional captcha response if required by AuraHub.")
 ):
     """
     Retrieves the final direct download link for a file using a valid download ticket.
-    Your API credentials are NOT used for this external Streamtape API call.
+    Your API credentials are NOT used for this external AuraHub API call.
 
     Args:
         file_id (str): The unique ID of the file.
         ticket (str): The download ticket obtained from the /stream/ticket endpoint.
-        captcha_response (str, optional): A response from a captcha if Streamtape requires it.
+        captcha_response (str, optional): A response from a captcha if AuraHub requires it.
 
     Returns:
         dict: A dictionary containing the file name, size, and the direct download URL.
@@ -65,7 +65,7 @@ async def get_file_info_endpoint(
     file_ids: str = Path(..., description="Comma-separated File-IDs (e.g., 'id1,id2,id3') for which to get information. Max 100.")
 ):
     """
-    Checks the status and detailed information of one or more files on Streamtape.
+    Checks the status and detailed information of one or more files on AuraHub.
     Your API credentials are NOT exposed in this endpoint.
 
     Args:

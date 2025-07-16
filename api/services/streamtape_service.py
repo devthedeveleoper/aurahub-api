@@ -5,7 +5,7 @@ from typing import Dict, Any, Optional, Union, List
 
 class StreamtapeService:
     """
-    Service class to interact with the Streamtape API.
+    Service class to interact with the AuraHub API.
     Handles HTTP requests and common error responses.
     """
     def __init__(self):
@@ -15,9 +15,9 @@ class StreamtapeService:
 
     async def _make_request(self, endpoint: str, params: Dict[str, Any]) -> Union[Dict[str, Any], List[Dict[str, Any]], str, bool]:
         """
-        Internal helper to make GET requests to the Streamtape API.
+        Internal helper to make GET requests to the AuraHub API.
         This method is now more flexible with its return type
-        to accommodate different Streamtape API responses (dict, list, str, bool).
+        to accommodate different AuraHub API responses (dict, list, str, bool).
         """
         params_with_auth = {
             "login": self.login,
@@ -34,7 +34,7 @@ class StreamtapeService:
                 if data.get("status") == 200:
                     return data["result"]
                 else:
-                    error_msg = data.get("msg", "An error occurred with the Streamtape API.")
+                    error_msg = data.get("msg", "An error occurred with the AuraHub API.")
                     if "result" in data and isinstance(data["result"], str):
                         error_msg = f"{error_msg}: {data['result']}"
                     raise HTTPException(
@@ -44,12 +44,12 @@ class StreamtapeService:
             except httpx.RequestError as exc:
                 raise HTTPException(
                     status_code=500,
-                    detail=f"An error occurred while requesting Streamtape API: {exc}"
+                    detail=f"An error occurred while requesting AuraHub API: {exc}"
                 )
             except httpx.HTTPStatusError as exc:
                 raise HTTPException(
                     status_code=exc.response.status_code,
-                    detail=f"Error response from Streamtape API: {exc.response.status_code} - {exc.response.text}"
+                    detail=f"Error response from AuraHub API: {exc.response.status_code} - {exc.response.text}"
                 )
             except Exception as exc:
                 raise HTTPException(
@@ -199,7 +199,7 @@ class StreamtapeService:
                 if data.get("status") == 200:
                     return data["result"]
                 else:
-                    error_msg = data.get("msg", "An error occurred with the Streamtape API.")
+                    error_msg = data.get("msg", "An error occurred with the AuraHub API.")
                     if "result" in data and isinstance(data["result"], str):
                         error_msg = f"{error_msg}: {data['result']}"
                     raise HTTPException(
@@ -209,12 +209,12 @@ class StreamtapeService:
             except httpx.RequestError as exc:
                 raise HTTPException(
                     status_code=500,
-                    detail=f"An error occurred while requesting Streamtape API: {exc}"
+                    detail=f"An error occurred while requesting AuraHub API: {exc}"
                 )
             except httpx.HTTPStatusError as exc:
                 raise HTTPException(
                     status_code=exc.response.status_code,
-                    detail=f"Error response from Streamtape API: {exc.response.status_code} - {exc.response.text}"
+                    detail=f"Error response from AuraHub API: {exc.response.status_code} - {exc.response.text}"
                 )
             except Exception as exc:
                 raise HTTPException(

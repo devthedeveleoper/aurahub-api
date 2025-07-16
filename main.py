@@ -5,7 +5,7 @@ from api.endpoints import converts
 from api.endpoints import stream
 
 app = FastAPI(
-    title="AuraHub API Wrapper",
+    title="AuraHub API",
     description="A FastAPI application to wrap AuraHub API functionalities.",
     version="1.0.0"
 )
