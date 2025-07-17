@@ -4,7 +4,7 @@ from api.services.streamtape_service import streamtape_service
 
 # Create an APIRouter instance for file/folder management
 router = APIRouter(
-    prefix="/v1", # All endpoints in this router will start with /v1
+    prefix="/streamtape", # All endpoints in this router will start with /streamtape
     tags=["File/Folder Management"] # Group these endpoints under a new tag
 )
 
