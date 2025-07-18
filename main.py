@@ -22,8 +22,8 @@ app.add_middleware(
 )
 
 # Include the routers for different functionalities
-app.include_router(upload.router)
 app.include_router(file_management.router)
+app.include_router(upload.router)
 app.include_router(converts.router)
 app.include_router(stream.router)
 
@@ -32,4 +32,4 @@ async def root():
     """
     Root endpoint to confirm the API is running.
     """
-    return {"message": "AuraHub API Wrapper is running! Visit /docs for API endpoints."}
+    return {"message": "AuraHub API is running! Visit /docs for API endpoints."}

@@ -4,7 +4,7 @@ from api.services.streamtape_service import streamtape_service
 
 # Create an APIRouter instance for streaming functionalities
 router = APIRouter(
-    prefix="/streamtape", # All endpoints in this router will start with /streamtape
+    prefix="/v1", # All endpoints in this router will start with /streamtape
     tags=["Stream & Info"] # Group these endpoints under a new tag
 )
 

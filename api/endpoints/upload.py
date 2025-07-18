@@ -1,10 +1,12 @@
-from fastapi import APIRouter, HTTPException, Query, Body # Keep Body for now, in case you need it elsewhere
-from typing import Optional, Dict, Any, Union
+# main.py (or your router file)
+
+from fastapi import APIRouter, HTTPException, Query
+from typing import Optional, Dict, Any, Union # Keep Union for general types, though not strictly needed here
 from api.services.streamtape_service import streamtape_service
 
 # Create an APIRouter instance
 router = APIRouter(
-    prefix="/streamtape", # All endpoints in this router will start with /streamtape
+    prefix="/v1", # All endpoints in this router will start with /streamtape
     tags=["Upload"] # Group these endpoints under the "Upload" tag in Swagger UI
 )
 
@@ -28,7 +30,6 @@ async def get_upload_url_endpoint(
         dict: A dictionary containing the upload URL and its validity period.
     """
     try:
-        # Call the service layer to get the upload URL
         upload_info = await streamtape_service.get_upload_url(
             folder=folder,
             sha256=sha256,
@@ -36,17 +37,16 @@ async def get_upload_url_endpoint(
         )
         return upload_info
     except HTTPException as e:
-        raise e # Re-raise FastAPI HTTPExceptions
+        raise e
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"An unexpected error occurred: {e}")
-
+    
 # --- Remote Upload Endpoints ---
 
 @router.post("/remote_upload/add", response_model=Dict[str, str])
 async def add_remote_upload_endpoint(
-    # CHANGED: Use Query(...) for parameters instead of Body(...)
     url: str = Query(..., description="The remote URL of the file to upload"),
-    folder: Optional[str] = Query(None, description="Optional Folder-ID to upload to"),
+    folder: str = Query(..., description="The Folder-ID to upload to. This is now mandatory."), # CHANGED: folder is now mandatory
     headers: Optional[str] = Query(None, description="Additional HTTP headers (e.g. 'Cookie: key=value'), separated by newlines"),
     name: Optional[str] = Query(None, description="Custom name for the new file (optional)")
 ):
@@ -55,7 +55,7 @@ async def add_remote_upload_endpoint(
 
     Args:
         url (str): The direct URL of the remote file to be uploaded.
-        folder (str, optional): The ID of the folder to upload the file to.
+        folder (str): The ID of the folder to upload the file to. THIS IS NOW MANDATORY.
         headers (str, optional): Additional HTTP headers for the remote server (e.g., for authentication).
         name (str, optional): A custom name for the uploaded file.
 
@@ -65,7 +65,7 @@ async def add_remote_upload_endpoint(
     try:
         remote_upload_info = await streamtape_service.add_remote_upload(
             url=url,
-            folder=folder,
+            folder=folder, # 'folder' will always have a string value here
             headers=headers,
             name=name
         )
